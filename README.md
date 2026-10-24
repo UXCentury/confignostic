@@ -9,10 +9,21 @@ Confignostic is an open-source control center for connecting and coordinating **
 ## Core product
 
 - **Unified chat** — interact with an agent directly or ask an orchestrator to delegate.
-- **Bring your own agents** — integrate independent agents via A2A, provider APIs, or custom adapters according to their actual capabilities.
+- **Bring your own agents** — integrate independent agents via ACP, A2A, provider APIs, or custom adapters according to their actual capabilities.
 - **Visual workflow editor** — design handoffs, dependencies, parallel steps, approvals, and error handling.
 - **Execution transparency** — see real task states, outputs, artifacts, and failures.
 - **Self-host or cloud** — open-source local installation, with a future managed Confignostic Cloud service and optional private runners.
+
+## Agent support targets
+
+The [supported-agent catalog](docs/SUPPORTED_AGENTS.md) tracks all 21 planned agent targets, their integration routes and implementation status.
+
+- **Coding agents:** Cursor, OpenAI Codex, Claude Code / Claude Agent SDK, GitHub Copilot, OpenCode, OpenHands and Grok Build.
+- **Additional ACP agents:** Gemini CLI, Goose, Cline, Factory Droid, JetBrains Junie, Kimi CLI, Kiro CLI, Mistral Vibe and Qwen Code.
+- **Stateful and custom agent systems:** Letta, LangGraph, Google ADK, Microsoft Agent Framework and Grok API-powered agents.
+- **Connection routes and tools:** ACP, A2A, custom HTTP/SDK adapters, MCP tools and X platform integration.
+
+**All entries are planned.** The current scaffold has no operational connectors. Provider capabilities and tested versions will be recorded as each integration is implemented.
 
 ## Run the development scaffold
 
@@ -46,7 +57,7 @@ The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/
 
 Apache License 2.0. The planned cloud product sells managed hosting, collaboration, reliability and support; the core self-hosted chat and orchestration should remain available without a cloud subscription.
 
-See [Architecture](docs/ARCHITECTURE.md), [Agent connectors](docs/CONNECTORS.md), [Product scope](docs/PRODUCT.md), [Roadmap](docs/ROADMAP.md), [Contributing](CONTRIBUTING.md), and [Security](SECURITY.md).
+See [Architecture](docs/ARCHITECTURE.md), [Agent connectors](docs/CONNECTORS.md), [Supported-agent catalog](docs/SUPPORTED_AGENTS.md), [Product scope](docs/PRODUCT.md), [Roadmap](docs/ROADMAP.md), [Contributing](CONTRIBUTING.md), and [Security](SECURITY.md).
 
 ## Previous project
 
