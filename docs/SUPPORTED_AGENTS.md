@@ -69,6 +69,22 @@ ACP and A2A are protocols, not additional agent products. Protocol support must 
 
 X platform access is a tool integration. It is separate from Grok Build and from Grok's X Search tool. Account-changing actions must follow Confignostic's approval policy.
 
+## Planned development stages
+
+The [A–Z development plan](plans/DEVELOPMENT_PLAN.md) assigns all 21 agent targets to implementation stages. Status changes require the [connector qualification evidence](plans/QUALITY_GATES.md#connector-qualification-record).
+
+| Stage | Agent targets | Count |
+| --- | --- | --- |
+| I | OpenAI Codex | 1 |
+| L | Cursor, using the reusable ACP connector | 1 |
+| Q | Claude Code / Claude Agent SDK, GitHub Copilot, OpenCode, OpenHands, Grok Build | 5 |
+| R | Letta, LangGraph, Google ADK, Microsoft Agent Framework | 4 |
+| S | Gemini CLI, Goose, Cline, Factory Droid, JetBrains Junie, Kimi CLI, Kiro CLI, Mistral Vibe, Qwen Code | 9 |
+| T | Grok API-powered agents | 1 |
+| **Total** | **Named agent targets** | **21** |
+
+Generic A2A/custom adapters are covered in R; MCP and X tools in T. The initial proven handoff is Codex → Cursor. All rows above remain Planned until their implementation and qualification are complete.
+
 ## Status and capability policy
 
 - **Planned:** a target is listed, but there is no verified Confignostic connector.

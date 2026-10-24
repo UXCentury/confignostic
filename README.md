@@ -25,6 +25,16 @@ The [supported-agent catalog](docs/SUPPORTED_AGENTS.md) tracks all 21 planned ag
 
 **All entries are planned.** The current scaffold has no operational connectors. Provider capabilities and tested versions will be recorded as each integration is implemented.
 
+## Development plan
+
+The [A–Z development plan](docs/plans/DEVELOPMENT_PLAN.md) contains **26 stages and 104 implementation tasks**, from the first real chat-to-agent task through the complete self-hosted product and optional managed cloud.
+
+- [Execution guide](docs/plans/EXECUTION_GUIDE.md) — task order, reviewable implementation steps and evidence.
+- [Quality gates](docs/plans/QUALITY_GATES.md) — measurable acceptance criteria for reliability, security, usability and operations.
+- [Roadmap](docs/ROADMAP.md) — release checkpoints and the separate self-hosted/cloud tracks.
+
+These are planned deliverables. Begin with product/contract foundations, then Codex, Cursor, a verified handoff and the shared workflow canvas.
+
 ## Run the development scaffold
 
 Requires Go 1.23+ and Node.js 20+.
