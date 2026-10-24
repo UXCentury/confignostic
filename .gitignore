@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+*.local
+*.log
+/bin/
+/dist/
+/tmp/
+/web/node_modules/
+/web/dist/
+/coverage.out
+.idea/
+.vscode/
+/confignostic-api
