@@ -2,39 +2,39 @@ package main
 
 import (
 	"context"
-	"errors"
-	"log"
-	"net/http"
+	"log/slog"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	"github.com/UXCentury/confignostic/internal/config"
 	"github.com/UXCentury/confignostic/internal/httpapi"
+	"github.com/UXCentury/confignostic/internal/server"
 )
 
 func main() {
-	addr := os.Getenv("CONFIGNOSTIC_LISTEN_ADDR")
-	if addr == "" {
-		addr = "127.0.0.1:8080"
-	}
-	srv := &http.Server{
-		Addr:              addr,
-		Handler:           httpapi.NewHandler(),
-		ReadHeaderTimeout: 5 * time.Second,
+	os.Exit(run())
+}
+
+func run() int {
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	cfg, err := config.Load(os.LookupEnv)
+	if err != nil {
+		logger.Error("invalid configuration", "error", err)
+		return 1
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	go func() {
-		<-ctx.Done()
-		c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(c); err != nil {
-			log.Printf("shutdown: %v", err)
-		}
-	}()
-	log.Printf("Confignostic API listening on %s", addr)
-	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	listener, err := net.Listen("tcp", cfg.ListenAddr)
+	if err != nil {
+		logger.Error("API listen failed", "error", err)
+		return 1
 	}
+	logger.Info("API listening", "address", listener.Addr().String())
+	if err := server.Serve(ctx, listener, httpapi.NewHandler(), cfg.ShutdownTimeout, logger); err != nil {
+		logger.Error("API stopped with an error", "error", err)
+		return 1
+	}
+	return 0
 }

@@ -33,16 +33,17 @@ The [A–Z development plan](docs/plans/DEVELOPMENT_PLAN.md) contains **26 stage
 - [Quality gates](docs/plans/QUALITY_GATES.md) — measurable acceptance criteria for reliability, security, usability and operations.
 - [Roadmap](docs/ROADMAP.md) — release checkpoints and the separate self-hosted/cloud tracks.
 
-These are planned deliverables. Begin with product/contract foundations, then Codex, Cursor, a verified handoff and the shared workflow canvas.
+The first foundation change implements the product acceptance fixture, reproducible development/CI and HTTP lifecycle handling. See [Foundation status](docs/FOUNDATION_STATUS.md) for evidence and remaining work. Agent integrations, chat execution and the canvas remain planned.
 
 ## Run the development scaffold
 
-Requires Go 1.23+ and Node.js 20+.
+Use the pinned Go, Node.js and npm versions in [Contributing](CONTRIBUTING.md).
 
 ```sh
-go run ./cmd/confignostic-api
+make dev-api
 # in another terminal:
-cd web && npm install && npm run dev
+npm --prefix web ci
+make dev-web
 ```
 
 The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/agents`, and `/api/v1/workflows`. The latter two return empty lists: no agent integration exists yet.
@@ -65,7 +66,7 @@ The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/
 
 ## Open source
 
-Apache License 2.0. The planned cloud product sells managed hosting, collaboration, reliability and support; the core self-hosted chat and orchestration should remain available without a cloud subscription.
+Apache License 2.0. The planned cloud product sells managed hosting, operations, reliability and support. Chat, orchestration and collaboration remain part of the self-hosted core without a cloud subscription.
 
 See [Architecture](docs/ARCHITECTURE.md), [Agent connectors](docs/CONNECTORS.md), [Supported-agent catalog](docs/SUPPORTED_AGENTS.md), [Product scope](docs/PRODUCT.md), [Roadmap](docs/ROADMAP.md), [Contributing](CONTRIBUTING.md), and [Security](SECURITY.md).
 

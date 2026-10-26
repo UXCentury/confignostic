@@ -1,0 +1,20 @@
+# Development-only database. The API does not use persistence until stage D.
+services:
+  postgres:
+    image: postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
+    environment:
+      POSTGRES_USER: confignostic
+      POSTGRES_DB: confignostic_dev
+      POSTGRES_PASSWORD: ${CONFIGNOSTIC_DEV_DB_PASSWORD:?Set a local development database password in .env}
+    ports:
+      - "127.0.0.1:${CONFIGNOSTIC_DEV_DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U confignostic -d confignostic_dev"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    stop_grace_period: 30s
+volumes:
+  postgres_dev:
