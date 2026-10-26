@@ -14,7 +14,7 @@ The catalog covers 21 named agent targets plus generic ACP, A2A and custom adapt
 
 ## Starting point and interpretation
 
-The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. **Every stage and task in this plan is initially Planned.** Existing scaffolding does not satisfy a stage's exit gate.
+The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A and B now have an implementation in review; see [Foundation status](../FOUNDATION_STATUS.md). Remaining stages are Planned. Existing scaffolding does not satisfy a stage's exit gate.
 
 “S+” is our internal quality target: demonstrated correctness, reliability, security, usability and operability against [measurable gates](QUALITY_GATES.md). It is not a claim that the current repository is production ready or an external certification.
 
@@ -34,8 +34,8 @@ Letters provide navigation; **dependencies determine execution order**. Q, R, S 
 
 | Stage | Outcome | Prerequisites | Status |
 | --- | --- | --- | --- |
-| A | [Lock the product contract](#stage-a) | None | Planned |
-| B | [Make development and CI reproducible](#stage-b) | A | Planned |
+| A | [Lock the product contract](#stage-a) | None | In review |
+| B | [Make development and CI reproducible](#stage-b) | A | In review |
 | C | [Define versioned domain and wire contracts](#stage-c) | A, B | Planned |
 | D | [Build durable storage and dispatch foundations](#stage-d) | C | Planned |
 | E | [Establish identity and workspace boundaries](#stage-e) | C, D | Planned |
@@ -99,7 +99,7 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 
 **Exit gate:** A reviewer can trace every requested product capability to a stage below. The reference workflow has a deterministic fixture and explicit success/failure outcomes; research assumptions are visible.
 
-**Evidence:** Approved scope brief and a scripted reference-workflow walkthrough.
+**Evidence:** [Product acceptance brief](../PRODUCT.md), [reference-fixture walkthrough](../../testdata/handoff/README.md), and [foundation validation](../FOUNDATION_STATUS.md). The full agent workflow remains planned.
 
 <a id="stage-b"></a>
 
@@ -116,7 +116,7 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 
 **Exit gate:** A clean checkout builds through documented commands and CI. A type error fails the frontend job; an in-flight request completes during graceful shutdown.
 
-**Evidence:** CI results, toolchain versions and the shutdown regression check.
+**Evidence:** [Development commands/toolchain policy](../../CONTRIBUTING.md), real-HTTP lifecycle regression tests, and [foundation validation](../FOUNDATION_STATUS.md).
 
 <a id="stage-c"></a>
 

@@ -2,7 +2,7 @@
 
 ## Status and product boundary
 
-This is the **target architecture**, not a description of implemented behavior. At the planning baseline, the repository has a Go HTTP scaffold and Svelte interface shell. Persistence, identity, runners, connectors and orchestration are planned.
+This is the **target architecture**, not a description of implemented behavior. The repository has a Go HTTP scaffold, validated startup configuration, synchronous request draining, reproducible build/CI tooling and a Svelte interface shell. The optional Compose database is development infrastructure; the API does not yet use it. Persistence, identity, runners, connectors and orchestration are planned.
 
 Confignostic owns the shared chat, workflow definitions, approvals, execution history and artifact references. It coordinates independent agent runtimes through documented interfaces. Core chat, canvas, connectors, automation and collaboration remain self-hostable; managed cloud operates the same core.
 

@@ -1,17 +1,60 @@
 name: CI
+
 on:
   push:
   pull_request:
+
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   go:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version-file: go.mod
-      - run: go vet ./...
-      - run: go test ./...
-      - run: go build ./cmd/confignostic-api
+          cache: false # No third-party Go modules yet.
+      - run: make check-go
+
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install the pinned package manager
+        run: npm install --global "$(node -p "require('./web/package.json').packageManager")"
+      - run: make check-web check-reference
+
+  development-database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      CONFIGNOSTIC_DEV_DB_PASSWORD: disposable-ci-database-only
+      CONFIGNOSTIC_DEV_DB_PORT: "55432"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: docker compose -f compose.dev.yaml config --quiet
+      - run: make db-up
+      - name: Verify the development database
+        run: docker compose -f compose.dev.yaml exec -T postgres psql -U confignostic -d confignostic_dev -v ON_ERROR_STOP=1 -c 'SELECT 1;'
+      - name: Remove the disposable CI database
+        if: always()
+        run: docker compose -f compose.dev.yaml down --volumes
