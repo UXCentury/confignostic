@@ -1,0 +1,112 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "workspace_id": {
+      "$ref": "common.schema.json#/$defs/WorkspaceID"
+    },
+    "task_id": {
+      "$ref": "common.schema.json#/$defs/TaskID"
+    },
+    "attempt_id": {
+      "$ref": "common.schema.json#/$defs/AttemptID"
+    },
+    "dispatch_id": {
+      "$ref": "common.schema.json#/$defs/DispatchID"
+    },
+    "connection_id": {
+      "$ref": "common.schema.json#/$defs/ConnectionID"
+    },
+    "lease_epoch": {
+      "$ref": "common.schema.json#/$defs/positiveCounter"
+    },
+    "correlation_id": {
+      "$ref": "common.schema.json#/$defs/RequestID"
+    },
+    "actor": {
+      "$ref": "common.schema.json#/$defs/actor"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+    },
+    "policy_version": {
+      "$ref": "common.schema.json#/$defs/policyVersion"
+    },
+    "approval_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/ApprovalID"
+      },
+      "maxItems": 16,
+      "uniqueItems": true
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        },
+        "artifact_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/ArtifactID"
+          },
+          "maxItems": 16,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "message"
+      ]
+    },
+    "workflow_run_id": {
+      "$ref": "common.schema.json#/$defs/WorkflowRunID"
+    },
+    "workflow_version_id": {
+      "$ref": "common.schema.json#/$defs/WorkflowVersionID"
+    },
+    "workflow_node_id": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "type": {
+      "const": "task.dispatch"
+    }
+  },
+  "required": [
+    "schema_version",
+    "workspace_id",
+    "task_id",
+    "attempt_id",
+    "dispatch_id",
+    "connection_id",
+    "lease_epoch",
+    "correlation_id",
+    "actor",
+    "idempotency_key",
+    "policy_version",
+    "input",
+    "type"
+  ],
+  "dependentRequired": {
+    "workflow_run_id": [
+      "workflow_version_id",
+      "workflow_node_id"
+    ],
+    "workflow_version_id": [
+      "workflow_run_id",
+      "workflow_node_id"
+    ],
+    "workflow_node_id": [
+      "workflow_run_id",
+      "workflow_version_id"
+    ]
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

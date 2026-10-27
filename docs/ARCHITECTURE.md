@@ -2,7 +2,7 @@
 
 ## Status and product boundary
 
-This is the **target architecture**, not a description of implemented behavior. The repository has a Go HTTP scaffold, validated startup configuration, synchronous request draining, reproducible build/CI tooling and a Svelte interface shell. The optional Compose database is development infrastructure; the API does not yet use it. Persistence, identity, runners, connectors and orchestration are planned.
+This is the **target architecture**, not a description of implemented behavior. The repository has a Go HTTP scaffold, validated startup configuration, synchronous request draining, reproducible build/CI tooling and a Svelte interface shell. The optional Compose database is development infrastructure; the API does not yet use it. Stage C implements typed identities, guarded transitions, wire contracts and stateless graph validation; see [Contracts](CONTRACTS.md). Persistence, authentication, runners, connectors and orchestration remain planned.
 
 Confignostic owns the shared chat, workflow definitions, approvals, execution history and artifact references. It coordinates independent agent runtimes through documented interfaces. Core chat, canvas, connectors, automation and collaboration remain self-hostable; managed cloud operates the same core.
 
@@ -75,22 +75,22 @@ Core workflows do not require billing modules. Hosted metering and provisioning 
 
 Workflow edges move validated data/artifact references. They do not turn arbitrary agent text into permissions or executable orchestration instructions.
 
-## Planned task lifecycle
+## Task lifecycle contract
 
 | State | Meaning | Allowed next states in the core model |
 | --- | --- | --- |
 | queued | Durable intent waiting for policy/capacity/dispatch. | awaiting_approval, dispatched, failed, canceled |
-| awaiting_approval | A scoped approval is pending before dispatch or at a paused action. | queued or running after approval, failed or canceled after a confirmed stop/denial, cancel_requested, unknown |
-| dispatched | Intent was sent; external acceptance/progress is not yet fully confirmed. | running, awaiting_input, awaiting_approval, completed, failed, cancel_requested, unknown |
-| running | The provider is executing the task. | awaiting_input, awaiting_approval, completed, failed, cancel_requested, unknown |
-| awaiting_input | The provider requires user input. | running, awaiting_approval, cancel_requested, failed, unknown |
+| awaiting_approval | A scoped approval is pending before dispatch or at a paused action. | queued or running after approval, completed/failed/canceled after a confirmed stop, cancel_requested, unknown |
+| dispatched | Intent was sent; external acceptance/progress is not yet fully confirmed. | running, awaiting_input, awaiting_approval, completed, failed, canceled after confirmation, cancel_requested, unknown |
+| running | The provider is executing the task. | awaiting_input, awaiting_approval, completed, failed, canceled after confirmation, cancel_requested, unknown |
+| awaiting_input | The provider requires user input. | running, awaiting_approval, cancel_requested, completed/failed/canceled after confirmation, unknown |
 | cancel_requested | Cancellation is requested; the provider may still be working. | canceled after confirmation, completed, failed, running if cancellation is rejected, unknown |
 | unknown | The external outcome cannot currently be confirmed. | running, awaiting_input, awaiting_approval, completed, failed, canceled after reconciliation |
 | completed | The documented success condition is confirmed. | Terminal for this attempt; explicit new work gets a new identity. |
 | failed | A failure is confirmed and no untracked execution is assumed. | Terminal for this attempt; an allowed retry creates a traceable new attempt. |
 | canceled | Cancellation/no execution is confirmed. | Terminal for this attempt. |
 
-Stage C must encode transition guards, not just this list. For example, a pre-dispatch denial can finalize locally; a mid-run denial needs confirmation that the external action/run stopped. A timeout with possible ongoing external effects becomes unknown, rather than a confirmed failure.
+Stage C encodes transition guards in internal/domain/attempt.go, beyond this state-pair summary. For example, a pre-dispatch denial can finalize locally; a mid-run denial needs confirmation that the external action/run stopped. A timeout with possible ongoing external effects becomes unknown, rather than a confirmed failure.
 
 Pause is a workflow scheduling control unless a provider explicitly supports pausing its execution. Skipped is a workflow-node outcome, not evidence that an external task was canceled. Retrying a task preserves the logical task ID and adds an attempt; terminal attempt records are immutable. Task status summarizes the active attempt: returning a failed/canceled logical task to queued requires creating an explicitly authorized new attempt, never reopening a terminal attempt.
 

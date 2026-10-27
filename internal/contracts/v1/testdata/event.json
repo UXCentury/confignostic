@@ -1,0 +1,22 @@
+{
+  "schema_version": "1",
+  "id": "evt_00000000000000000000000000000001",
+  "workspace_id": "wsp_00000000000000000000000000000001",
+  "task_id": "tsk_00000000000000000000000000000001",
+  "attempt_id": "atm_00000000000000000000000000000001",
+  "sequence": "9007199254740993",
+  "occurred_at": "2026-10-26T16:00:00Z",
+  "actor": {
+    "kind": "agent",
+    "id": "act_00000000000000000000000000000001"
+  },
+  "correlation_id": "req_00000000000000000000000000000001",
+  "provider": {
+    "session_id": "provider-session-42",
+    "event_id": "provider-event-7"
+  },
+  "type": "task.output",
+  "payload": {
+    "text": "Implementation complete.\nReview the exact artifact."
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/EventID"
+    },
+    "workspace_id": {
+      "$ref": "common.schema.json#/$defs/WorkspaceID"
+    },
+    "task_id": {
+      "$ref": "common.schema.json#/$defs/TaskID"
+    },
+    "attempt_id": {
+      "$ref": "common.schema.json#/$defs/AttemptID"
+    },
+    "sequence": {
+      "$ref": "common.schema.json#/$defs/positiveCounter"
+    },
+    "occurred_at": {
+      "$ref": "common.schema.json#/$defs/timestamp"
+    },
+    "actor": {
+      "$ref": "common.schema.json#/$defs/actor"
+    },
+    "correlation_id": {
+      "$ref": "common.schema.json#/$defs/RequestID"
+    },
+    "provider": {
+      "$ref": "common.schema.json#/$defs/providerRef"
+    },
+    "type": {
+      "enum": [
+        "task.state_changed",
+        "task.output",
+        "approval.requested",
+        "artifact.created"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "workspace_id",
+    "task_id",
+    "attempt_id",
+    "sequence",
+    "occurred_at",
+    "actor",
+    "correlation_id",
+    "type",
+    "payload"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "task.state_changed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "$ref": "common.schema.json#/$defs/state"
+              },
+              "to": {
+                "$ref": "common.schema.json#/$defs/state"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "task.output"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 32768
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "approval.requested"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "approval_id": {
+                "$ref": "common.schema.json#/$defs/ApprovalID"
+              },
+              "action_digest": {
+                "$ref": "common.schema.json#/$defs/digest"
+              },
+              "policy_version": {
+                "$ref": "common.schema.json#/$defs/policyVersion"
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "expires_at": {
+                "$ref": "common.schema.json#/$defs/timestamp"
+              }
+            },
+            "required": [
+              "approval_id",
+              "action_digest",
+              "policy_version",
+              "scope",
+              "expires_at"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "artifact.created"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "$ref": "common.schema.json#/$defs/ArtifactID"
+              },
+              "sha256": {
+                "$ref": "common.schema.json#/$defs/digest"
+              },
+              "media_type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "size_bytes": {
+                "$ref": "common.schema.json#/$defs/counter"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "sha256",
+              "media_type",
+              "size_bytes"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

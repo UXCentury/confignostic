@@ -22,7 +22,8 @@ jobs:
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version-file: go.mod
-          cache: false # No third-party Go modules yet.
+          cache: true
+          cache-dependency-path: go.sum
       - run: make check-go
 
   web:

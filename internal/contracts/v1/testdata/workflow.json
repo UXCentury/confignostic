@@ -1,0 +1,72 @@
+{
+  "schema_version": "1",
+  "id": "wfl_00000000000000000000000000000001",
+  "workspace_id": "wsp_00000000000000000000000000000001",
+  "version_id": "wfv_00000000000000000000000000000001",
+  "revision": "1",
+  "name": "Implement then review",
+  "inputs": {
+    "request": "text"
+  },
+  "entry_nodes": [
+    "implement"
+  ],
+  "nodes": [
+    {
+      "id": "implement",
+      "kind": "agent",
+      "connection_id": "con_00000000000000000000000000000001",
+      "requires": [
+        "artifacts"
+      ],
+      "inputs": {
+        "prompt": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "outputs": {
+        "change": "artifact"
+      }
+    },
+    {
+      "id": "review",
+      "kind": "agent",
+      "connection_id": "con_00000000000000000000000000000002",
+      "requires": [
+        "structured_output"
+      ],
+      "inputs": {
+        "change": {
+          "type": "artifact",
+          "required": true
+        }
+      },
+      "outputs": {
+        "findings": "json"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": {
+        "node_id": "$input",
+        "port": "request"
+      },
+      "to": {
+        "node_id": "implement",
+        "port": "prompt"
+      }
+    },
+    {
+      "from": {
+        "node_id": "implement",
+        "port": "change"
+      },
+      "to": {
+        "node_id": "review",
+        "port": "change"
+      }
+    }
+  ]
+}

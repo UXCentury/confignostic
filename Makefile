@@ -6,6 +6,7 @@ fmt-check:
 	@files="$$(gofmt -l cmd internal)"; if [ -n "$$files" ]; then printf 'Run gofmt on:\n%s\n' "$$files"; exit 1; fi
 
 check-go: fmt-check
+	go mod verify
 	go vet ./...
 	go test -race ./...
 	go build -o bin/confignostic-api ./cmd/confignostic-api

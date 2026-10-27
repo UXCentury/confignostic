@@ -14,7 +14,7 @@ The catalog covers 21 named agent targets plus generic ACP, A2A and custom adapt
 
 ## Starting point and interpretation
 
-The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A and B now have an implementation in review; see [Foundation status](../FOUNDATION_STATUS.md). Remaining stages are Planned. Existing scaffolding does not satisfy a stage's exit gate.
+The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A and B are Done after [PR #5](https://github.com/UXCentury/confignostic/pull/5). Stage C is implemented and In review; see [Contracts](../CONTRACTS.md). Stages D–Z remain Planned. Existing scaffolding does not satisfy a stage's exit gate.
 
 “S+” is our internal quality target: demonstrated correctness, reliability, security, usability and operability against [measurable gates](QUALITY_GATES.md). It is not a claim that the current repository is production ready or an external certification.
 
@@ -34,9 +34,9 @@ Letters provide navigation; **dependencies determine execution order**. Q, R, S 
 
 | Stage | Outcome | Prerequisites | Status |
 | --- | --- | --- | --- |
-| A | [Lock the product contract](#stage-a) | None | In review |
-| B | [Make development and CI reproducible](#stage-b) | A | In review |
-| C | [Define versioned domain and wire contracts](#stage-c) | A, B | Planned |
+| A | [Lock the product contract](#stage-a) | None | Done |
+| B | [Make development and CI reproducible](#stage-b) | A | Done |
+| C | [Define versioned domain and wire contracts](#stage-c) | A, B | In review |
 | D | [Build durable storage and dispatch foundations](#stage-d) | C | Planned |
 | E | [Establish identity and workspace boundaries](#stage-e) | C, D | Planned |
 | F | [Protect credentials and authorize actions](#stage-f) | E | Planned |
@@ -92,10 +92,10 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 **Outcome:** Make the full product and the first useful workflow unambiguous.  
 **Deliverables:** Product acceptance brief, reference project, scope decisions and initial user-feedback questions.
 
-- [ ] **A01** — Document the primary journey: self-host, create a workspace, connect an agent, send a task, inspect real progress, approve an action, and receive a persistent result.
-- [ ] **A02** — Define the reference workflow: Codex implements a bounded change in a test repository, Cursor reviews the resulting artifact, and the user receives both results in one conversation.
-- [ ] **A03** — Record all 21 catalog targets, the three protocol/adapter routes, MCP and X tools, and the open-source/cloud boundary. Keep local chat, connectors, orchestration, canvas and collaboration self-hostable.
-- [ ] **A04** — Record assumptions with a named owner: initial Linux/Docker support, access to provider accounts, private-runner execution, and the early developer-team audience. Collect feedback alongside implementation.
+- [x] **A01** — Document the primary journey: self-host, create a workspace, connect an agent, send a task, inspect real progress, approve an action, and receive a persistent result.
+- [x] **A02** — Define the reference workflow: Codex implements a bounded change in a test repository, Cursor reviews the resulting artifact, and the user receives both results in one conversation.
+- [x] **A03** — Record all 21 catalog targets, the three protocol/adapter routes, MCP and X tools, and the open-source/cloud boundary. Keep local chat, connectors, orchestration, canvas and collaboration self-hostable.
+- [x] **A04** — Record assumptions with a named owner: initial Linux/Docker support, access to provider accounts, private-runner execution, and the early developer-team audience. Collect feedback alongside implementation.
 
 **Exit gate:** A reviewer can trace every requested product capability to a stage below. The reference workflow has a deterministic fixture and explicit success/failure outcomes; research assumptions are visible.
 
@@ -109,10 +109,10 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 **Outcome:** Make each subsequent change easy to build, verify and review.  
 **Deliverables:** Pinned toolchain policy, frontend lockfile, developer commands, CI jobs and repository conventions.
 
-- [ ] **B01** — Pin compatible Go/Node/package-manager versions, commit the frontend dependency lockfile, and document clean-checkout setup. Add a development PostgreSQL service with disposable test data.
-- [ ] **B02** — Run Go formatting checks, vet, tests and build in CI; add frontend type/Svelte checks and production build. Add UI tests only for meaningful behaviors as those behaviors arrive.
-- [ ] **B03** — Define configuration parsing, structured error/log conventions and the documentation/evidence layout. Make health and readiness separate when dependencies are introduced.
-- [ ] **B04** — Fix the reviewed server shutdown issue so main waits for shutdown completion. Verify a controlled in-flight request drains; keep CI credentials away from untrusted pull-request code.
+- [x] **B01** — Pin compatible Go/Node/package-manager versions, commit the frontend dependency lockfile, and document clean-checkout setup. Add a development PostgreSQL service with disposable test data.
+- [x] **B02** — Run Go formatting checks, vet, tests and build in CI; add frontend type/Svelte checks and production build. Add UI tests only for meaningful behaviors as those behaviors arrive.
+- [x] **B03** — Define configuration parsing, structured error/log conventions and the documentation/evidence layout. Make health and readiness separate when dependencies are introduced.
+- [x] **B04** — Fix the reviewed server shutdown issue so main waits for shutdown completion. Verify a controlled in-flight request drains; keep CI credentials away from untrusted pull-request code.
 
 **Exit gate:** A clean checkout builds through documented commands and CI. A type error fails the frontend job; an in-flight request completes during graceful shutdown.
 
@@ -133,7 +133,7 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 
 **Exit gate:** Contract examples round-trip and invalid states/schemas are rejected. Two concurrent clients cannot overwrite a workflow revision silently.
 
-**Evidence:** Reviewed schemas, representative protocol fixtures and contract validation results.
+**Evidence:** [Implemented contract specification](../CONTRACTS.md), embedded JSON Schemas, real HTTP validation tests, guarded lifecycle tests, concurrent revision-conflict tests and round-trip protocol fixtures. Stage C remains In review until its PR is accepted.
 
 <a id="stage-d"></a>
 

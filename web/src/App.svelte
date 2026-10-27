@@ -47,6 +47,6 @@
       <input disabled aria-label="Chat unavailable" placeholder="Connect an agent to enable chat (coming soon)" />
       <button disabled aria-label="Sending unavailable">↗</button>
     </div>
-    <p class="note">No agent messages have been sent. The backend currently serves only health and empty listings.</p>
+    <p class="note">No agent messages have been sent. Chat and agent connections are not operational yet.</p>
   </main>
 </div>

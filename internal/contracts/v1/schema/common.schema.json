@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "WorkspaceID": {
+      "type": "string",
+      "pattern": "^wsp_[0-9a-f]{32}$"
+    },
+    "ProjectID": {
+      "type": "string",
+      "pattern": "^prj_[0-9a-f]{32}$"
+    },
+    "AgentID": {
+      "type": "string",
+      "pattern": "^agt_[0-9a-f]{32}$"
+    },
+    "ConnectionID": {
+      "type": "string",
+      "pattern": "^con_[0-9a-f]{32}$"
+    },
+    "ConversationID": {
+      "type": "string",
+      "pattern": "^cnv_[0-9a-f]{32}$"
+    },
+    "MessageID": {
+      "type": "string",
+      "pattern": "^msg_[0-9a-f]{32}$"
+    },
+    "TaskID": {
+      "type": "string",
+      "pattern": "^tsk_[0-9a-f]{32}$"
+    },
+    "AttemptID": {
+      "type": "string",
+      "pattern": "^atm_[0-9a-f]{32}$"
+    },
+    "DispatchID": {
+      "type": "string",
+      "pattern": "^dsp_[0-9a-f]{32}$"
+    },
+    "EventID": {
+      "type": "string",
+      "pattern": "^evt_[0-9a-f]{32}$"
+    },
+    "ApprovalID": {
+      "type": "string",
+      "pattern": "^apr_[0-9a-f]{32}$"
+    },
+    "ArtifactID": {
+      "type": "string",
+      "pattern": "^art_[0-9a-f]{32}$"
+    },
+    "WorkflowID": {
+      "type": "string",
+      "pattern": "^wfl_[0-9a-f]{32}$"
+    },
+    "WorkflowVersionID": {
+      "type": "string",
+      "pattern": "^wfv_[0-9a-f]{32}$"
+    },
+    "WorkflowRunID": {
+      "type": "string",
+      "pattern": "^run_[0-9a-f]{32}$"
+    },
+    "RunnerID": {
+      "type": "string",
+      "pattern": "^rnr_[0-9a-f]{32}$"
+    },
+    "ActorID": {
+      "type": "string",
+      "pattern": "^act_[0-9a-f]{32}$"
+    },
+    "RequestID": {
+      "type": "string",
+      "pattern": "^req_[0-9a-f]{32}$"
+    },
+    "counter": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$"
+    },
+    "positiveCounter": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]{0,19}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+    },
+    "valueType": {
+      "enum": [
+        "text",
+        "json",
+        "artifact",
+        "boolean"
+      ]
+    },
+    "capability": {
+      "enum": [
+        "invoke",
+        "stream_events",
+        "cancel",
+        "resume",
+        "reconcile",
+        "artifacts",
+        "structured_output",
+        "usage",
+        "approvals",
+        "user_input",
+        "list_sessions",
+        "create_session",
+        "load_session",
+        "idempotent_invoke"
+      ]
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/capability"
+      },
+      "maxItems": 16,
+      "uniqueItems": true
+    },
+    "state": {
+      "enum": [
+        "queued",
+        "awaiting_approval",
+        "dispatched",
+        "running",
+        "awaiting_input",
+        "cancel_requested",
+        "unknown",
+        "completed",
+        "failed",
+        "canceled"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "human",
+            "planner",
+            "agent",
+            "system"
+          ]
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/ActorID"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policyVersion": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "providerRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\u0000-\u001f\u007f]+$"
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\u0000-\u001f\u007f]+$"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[^\u0000-\u001f\u007f]+$"
+        }
+      },
+      "required": [],
+      "anyOf": [
+        {
+          "required": [
+            "session_id"
+          ]
+        },
+        {
+          "required": [
+            "operation_id"
+          ]
+        }
+      ]
+    },
+    "problem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_json",
+            "invalid_schema",
+            "unsupported_version",
+            "payload_too_large",
+            "invalid_workflow",
+            "unauthorized",
+            "forbidden",
+            "unsupported_operation",
+            "unavailable",
+            "revision_conflict",
+            "cursor_expired",
+            "rate_limited",
+            "uncertain_outcome",
+            "internal_error"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "retry": {
+          "enum": [
+            "never",
+            "backoff",
+            "reconcile"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retry"
+      ]
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "path",
+        "code"
+      ]
+    }
+  }
+}

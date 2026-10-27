@@ -1,0 +1,200 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/WorkflowID"
+    },
+    "workspace_id": {
+      "$ref": "common.schema.json#/$defs/WorkspaceID"
+    },
+    "version_id": {
+      "$ref": "common.schema.json#/$defs/WorkflowVersionID"
+    },
+    "revision": {
+      "$ref": "common.schema.json#/$defs/positiveCounter"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "inputs": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "maxProperties": 32,
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/valueType"
+      }
+    },
+    "entry_nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "kind": {
+            "enum": [
+              "agent",
+              "approval",
+              "condition",
+              "transform",
+              "join"
+            ]
+          },
+          "connection_id": {
+            "$ref": "common.schema.json#/$defs/ConnectionID"
+          },
+          "requires": {
+            "$ref": "common.schema.json#/$defs/capabilities"
+          },
+          "inputs": {
+            "type": "object",
+            "propertyNames": {
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "maxProperties": 32,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "$ref": "common.schema.json#/$defs/valueType"
+                },
+                "required": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "type",
+                "required"
+              ]
+            }
+          },
+          "outputs": {
+            "type": "object",
+            "propertyNames": {
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "maxProperties": 32,
+            "additionalProperties": {
+              "$ref": "common.schema.json#/$defs/valueType"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "agent"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "connection_id"
+              ]
+            },
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "connection_id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "requires"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "maxItems": 100,
+      "minItems": 1
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "node_id": {
+                "type": "string",
+                "pattern": "^(\\$input|[a-z][a-z0-9_-]{0,63})$"
+              },
+              "port": {
+                "$ref": "common.schema.json#/$defs/name"
+              }
+            },
+            "required": [
+              "node_id"
+            ]
+          },
+          "to": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "node_id": {
+                "type": "string",
+                "pattern": "^(\\$input|[a-z][a-z0-9_-]{0,63})$"
+              },
+              "port": {
+                "$ref": "common.schema.json#/$defs/name"
+              }
+            },
+            "required": [
+              "node_id"
+            ]
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "maxItems": 500
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "workspace_id",
+    "version_id",
+    "revision",
+    "name",
+    "entry_nodes",
+    "nodes"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
