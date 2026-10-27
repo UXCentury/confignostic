@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "workspace_id": "wsp_00000000000000000000000000000001",
+  "runner_id": "rnr_00000000000000000000000000000001",
+  "runtime_version": "contract-fixture",
+  "protocol_versions": [
+    "1",
+    "2"
+  ],
+  "max_message_bytes": 65536,
+  "type": "runner.hello"
+}

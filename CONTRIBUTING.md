@@ -34,7 +34,7 @@ make dev-api
 make dev-web
 ```
 
-The API defaults to 127.0.0.1:8080; Vite defaults to 127.0.0.1:5173 and proxies API requests. The UI is still a disabled scaffold. The two listing endpoints return empty arrays. Development API routes are read-only and unauthenticated; keep the loopback default until identity and workspace authorization are implemented.
+The API defaults to 127.0.0.1:8080; Vite defaults to 127.0.0.1:5173 and proxies API requests. The UI is still a disabled scaffold. The two listing endpoints return empty arrays. A stateless POST `/api/v1/workflows/validate` endpoint checks graph structure; see [Contracts](docs/CONTRACTS.md). The development API exposes listings and stateless validation without authentication; keep the loopback default until identity and workspace authorization are implemented.
 
 ## Checks and builds
 
@@ -43,7 +43,7 @@ make check
 make build
 ```
 
-`make check` runs Go formatting checks, vet, race-enabled tests, an API build, a clean frontend install, Svelte/TypeScript checks, a production frontend build, and the reference-fixture self-checks. Individual targets: `make check-go`, `make check-web`, `make check-reference`. Fix Go formatting with `gofmt -w cmd internal`.
+`make check` runs Go formatting checks, module verification, vet, race-enabled tests, an API build, a clean frontend install, Svelte/TypeScript checks, a production frontend build, and the reference-fixture self-checks. Individual targets: `make check-go`, `make check-web`, `make check-reference`. Fix Go formatting with `gofmt -w cmd internal`.
 
 Build outputs are bin/confignostic-api and web/dist/. Run `npm --prefix web ci` before `make build` on a fresh checkout. No global Vite/Svelte installation is needed. The API does not serve the built frontend yet; unified packaging belongs to stage V.
 

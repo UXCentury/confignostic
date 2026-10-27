@@ -1,0 +1,213 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Confignostic developer API",
+    "version": "0.1.0",
+    "description": "Current surface: liveness, empty scaffold listings and stateless workflow validation. Authentication, execution and persistence are not implemented. Keep the development service bound to loopback."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Process liveness only.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "operationId": "listagentsScaffold",
+        "x-implementation-status": "scaffold",
+        "responses": {
+          "200": {
+            "description": "Always an empty list; no storage or execution.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workflows": {
+      "get": {
+        "operationId": "listworkflowsScaffold",
+        "x-implementation-status": "scaffold",
+        "responses": {
+          "200": {
+            "description": "Always an empty list; no storage or execution.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workflows/validate": {
+      "post": {
+        "operationId": "validateWorkflow",
+        "summary": "Validate graph structure without execution or storage",
+        "description": "Maximum body size is 256 KiB. Rejects duplicate keys, nulls, unknown fields, unsupported versions, cycles, unreachable nodes, type mismatches and missing inputs. Agent availability, permissions, executor-specific settings and budgets are not checked.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../internal/contracts/v1/schema/workflow.schema.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Graph passes structural validation. It is not authorized or ready for execution.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "schema_version",
+                    "request_id",
+                    "valid",
+                    "capabilities_checked",
+                    "executable"
+                  ],
+                  "properties": {
+                    "schema_version": {
+                      "const": "1"
+                    },
+                    "request_id": {
+                      "$ref": "../internal/contracts/v1/schema/common.schema.json#/$defs/RequestID"
+                    },
+                    "valid": {
+                      "const": true
+                    },
+                    "capabilities_checked": {
+                      "const": false
+                    },
+                    "executable": {
+                      "const": false
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/common.schema.json#/$defs/RequestID"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "const": "POST"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Versioned error. No request body or credential values are echoed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

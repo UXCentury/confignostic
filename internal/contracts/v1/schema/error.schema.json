@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "request_id": {
+      "$ref": "common.schema.json#/$defs/RequestID"
+    },
+    "error": {
+      "$ref": "common.schema.json#/$defs/problem"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/issue"
+      },
+      "maxItems": 20,
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "error"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

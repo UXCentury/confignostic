@@ -29,30 +29,13 @@ A connection reports its tested adapter/version, execution location, authenticat
 - approval requests and user-input requests;
 - idempotent invocation or an operation lookup mechanism, with its actual scope and limitations.
 
-The final field names/schema are defined in stage C. A capability must describe the combination of adapter, provider version and account configuration. Report Unsupported, Unauthorized and Unavailable separately. Missing usage is unknown, not zero.
+Stage C defines the [capability vocabulary and versioned contracts](CONTRACTS.md). Registry discovery and per-provider descriptors are implemented in H. A capability must describe the combination of adapter, provider version and account configuration. Report Unsupported, Unauthorized and Unavailable separately. Missing usage is unknown, not zero.
 
 ## Task and event boundary
 
-The canonical planned task-state table is in [Architecture](ARCHITECTURE.md#planned-task-lifecycle). Preserve distinct logical task, attempt, dispatch and provider session/operation IDs.
+The task-state contract is in [Architecture](ARCHITECTURE.md#task-lifecycle-contract), with implemented transition guards in stage C. Preserve distinct logical task, attempt, dispatch and provider session/operation IDs.
 
-Conceptual envelope to formalize in C:
-
-```json
-{
-  "schema_version": "1",
-  "workspace_id": "uuid",
-  "workflow_run_id": "uuid",
-  "task_id": "uuid",
-  "attempt_id": "uuid",
-  "dispatch_id": "uuid",
-  "connection_id": "uuid",
-  "input": { "message": "string", "artifact_refs": [] },
-  "idempotency_key": "string",
-  "policy_version": "string",
-  "approval_refs": [],
-  "trace_id": "string"
-}
-```
+Stage C supplies the [dispatch schema](../internal/contracts/v1/schema/dispatch.schema.json), [runner acknowledgment schema](../internal/contracts/v1/schema/ack.schema.json), and [representative dispatch fixture](../internal/contracts/v1/testdata/dispatch.json). These contracts are implemented; the runner transport and connectors remain planned.
 
 Workspace identity and approval references are supplied and validated by the control plane, not trusted from a provider. Credentials travel through scoped secret resolution, not this envelope.
 

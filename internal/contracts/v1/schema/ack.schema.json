@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "workspace_id": {
+      "$ref": "common.schema.json#/$defs/WorkspaceID"
+    },
+    "runner_id": {
+      "$ref": "common.schema.json#/$defs/RunnerID"
+    },
+    "dispatch_id": {
+      "$ref": "common.schema.json#/$defs/DispatchID"
+    },
+    "attempt_id": {
+      "$ref": "common.schema.json#/$defs/AttemptID"
+    },
+    "lease_epoch": {
+      "$ref": "common.schema.json#/$defs/positiveCounter"
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected"
+      ]
+    },
+    "error": {
+      "$ref": "common.schema.json#/$defs/problem"
+    },
+    "type": {
+      "const": "task.ack"
+    }
+  },
+  "required": [
+    "schema_version",
+    "workspace_id",
+    "runner_id",
+    "dispatch_id",
+    "attempt_id",
+    "lease_epoch",
+    "status",
+    "type"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "rejected"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "error"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "error"
+          ]
+        }
+      }
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

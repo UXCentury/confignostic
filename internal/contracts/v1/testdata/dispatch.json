@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "workspace_id": "wsp_00000000000000000000000000000001",
+  "task_id": "tsk_00000000000000000000000000000001",
+  "attempt_id": "atm_00000000000000000000000000000001",
+  "dispatch_id": "dsp_00000000000000000000000000000001",
+  "connection_id": "con_00000000000000000000000000000001",
+  "lease_epoch": "7",
+  "correlation_id": "req_00000000000000000000000000000001",
+  "actor": {
+    "kind": "human",
+    "id": "act_00000000000000000000000000000002"
+  },
+  "idempotency_key": "fixture-task-1",
+  "policy_version": "policy-v1",
+  "input": {
+    "message": "Normalize aliases, then prepare the bounded artifact."
+  },
+  "type": "task.dispatch"
+}

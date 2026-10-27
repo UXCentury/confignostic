@@ -1,6 +1,6 @@
 # Foundation implementation: A and B
 
-Prepared: 2026-10-26. Status: implementation in review; no operational agent integration or release qualification is claimed.
+Prepared: 2026-10-26. Status: Done; merged in [PR #5](https://github.com/UXCentury/confignostic/pull/5). No operational agent integration or release qualification is claimed.
 
 ## Delivered scope
 
@@ -22,12 +22,12 @@ Environment: Linux x86-64; Go 1.27.3; Node.js 24.22.1; npm 11.9.0.
 - Negative frontend probe: a temporary TypeScript file assigning a string to a number made the same frontend check fail. The probe was then removed.
 - Built-binary smoke check: all three existing HTTP routes returned their expected responses, SIGTERM exited 0 after JSON drain/completion logs, and invalid configuration exited 1 without echoing the synthetic supplied value.
 
-The Docker daemon is unavailable in the implementation environment. The development-database CI job validates the actual Compose service on GitHub's runner. Its result and the exact commit belong in the PR checks before this foundation is accepted.
+All three [GitHub CI jobs](https://github.com/UXCentury/confignostic/actions/runs/40342775285) passed for foundation commit fbb6b41e2f2e23d5f4cf267ffd1ee1ef31c4e7aa. The database job started the pinned Compose service and ran SELECT 1. PR #5 was merged as df8713d03dfa5705ff73dba2f6078a038166ceac. The implementation environment itself has no Docker daemon.
 
 ## Scope limits and next step
 
 All 21 agent targets remain Planned. The fixture self-check is local test code, not a real provider run. No provider access, user interviews, paid demand, authentication, persistence or canvas behavior is implied by this change. User feedback collection remains ongoing work.
 
-Stages A/B remain In review and their task checkboxes stay open until the foundation review and required CI checks are accepted. Next is C01–C04: implement versioned identities, guarded task transitions, public/runner event contracts and workflow schema validation. PostgreSQL migrations follow in D; the current API does not use the Compose database.
+Stages A/B are accepted and their task checkboxes are complete. The next change implements [stage C contracts](CONTRACTS.md), including stateless graph validation. PostgreSQL migrations follow in D; the current API does not use the Compose database.
 
 See [Contributing](../CONTRIBUTING.md), [Product acceptance](PRODUCT.md), [Reference fixture](../testdata/handoff/README.md), and [A–Z plan](plans/DEVELOPMENT_PLAN.md).

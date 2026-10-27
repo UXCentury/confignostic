@@ -2,7 +2,7 @@
 
 This is the checkpoint summary for the [A–Z development plan](plans/DEVELOPMENT_PLAN.md): **26 stages and 104 implementation tasks**.
 
-Stages A and B have a foundation implementation in review; see [Foundation status](FOUNDATION_STATUS.md). Stages C–Z remain Planned. The repository still has no working agent connector, chat execution or orchestration engine.
+Stages A and B are Done; see [Foundation status](FOUNDATION_STATUS.md). Stage C contracts and stateless workflow validation are implemented and In review; see [Contracts](CONTRACTS.md). Stages D–Z remain Planned. The repository still has no working agent connector, chat execution or orchestration engine.
 
 ## Product destination
 
@@ -35,7 +35,7 @@ The complete 21-target milestone requires real evidence for all 21; earlier rele
 4. [Architecture](ARCHITECTURE.md): shared data model, runner boundaries and task lifecycle.
 5. [Agent catalog](SUPPORTED_AGENTS.md): per-provider routes and status.
 
-After the A/B foundation is accepted, the next implementation sequence is C01–C04 for domain and wire contracts, then D for persistence. The first two agents remain Codex and Cursor; broad connector coverage follows a proven handoff.
+After stage C is accepted, the next implementation sequence is D01–D04 for PostgreSQL persistence, durable event/outbox storage and concurrent dispatch foundations. The first two agents remain Codex and Cursor; broad connector coverage follows a proven handoff.
 
 ## Product validation and scope
 

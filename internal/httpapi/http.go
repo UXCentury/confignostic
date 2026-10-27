@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-// NewHandler exposes the read-only developer scaffold, not real agent execution.
+// NewHandler exposes the developer scaffold and stateless graph validation.
+// It does not execute agents or persist workflows.
 func NewHandler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
@@ -17,6 +18,7 @@ func NewHandler() http.Handler {
 	mux.HandleFunc("GET /api/v1/workflows", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, []struct{}{})
 	})
+	mux.HandleFunc("/api/v1/workflows/validate", validateWorkflow)
 	return mux
 }
 

@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "workspace_id": {
+      "$ref": "common.schema.json#/$defs/WorkspaceID"
+    },
+    "runner_id": {
+      "$ref": "common.schema.json#/$defs/RunnerID"
+    },
+    "runtime_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "protocol_versions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,3}$"
+      },
+      "maxItems": 16,
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "max_message_bytes": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 1048576
+    },
+    "type": {
+      "const": "runner.hello"
+    }
+  },
+  "required": [
+    "schema_version",
+    "workspace_id",
+    "runner_id",
+    "runtime_version",
+    "protocol_versions",
+    "max_message_bytes",
+    "type"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
