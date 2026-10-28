@@ -1,16 +1,35 @@
 package httpapi
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 // NewHandler exposes the developer scaffold and stateless graph validation.
 // It does not execute agents or persist workflows.
 func NewHandler() http.Handler {
+	return NewHandlerWithReadiness(nil)
+}
+
+func NewHandlerWithReadiness(ready func(context.Context) error) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	})
+	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
+		if ready == nil {
+			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"status": "storage_not_configured"})
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		if ready(ctx) != nil {
+			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"status": "not_ready"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ready"})
 	})
 	mux.HandleFunc("GET /api/v1/agents", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, []struct{}{})

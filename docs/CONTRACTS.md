@@ -1,6 +1,6 @@
 # Version 1 domain and wire contracts
 
-Status: stage C implementation in review. The stateless workflow validator is operational. Durable storage, identity, agent connections, runner transport and execution remain planned.
+Status: stage C accepted in [PR #6](https://github.com/UXCentury/confignostic/pull/6). The stateless workflow validator is operational. Stage D adds [internal durable storage](STORAGE.md); authentication, operational agent connections, runner transport and execution remain planned.
 
 ## Implemented HTTP surface
 
@@ -63,7 +63,7 @@ Counters, revisions, sequence numbers, lease epochs and artifact byte counts use
 - An unknown attempt can resume or terminate only through reconciliation evidence.
 - A retry requires explicit authorization, a different attempt ID and a confirmed failed/canceled predecessor. It retains the logical task ID and increments the attempt number. Unknown and completed attempts cannot be retried through this operation.
 
-Evidence values are inputs from trusted policy/connector/reconciliation code. They are not bearer permissions and must never be accepted directly from a client/model as proof. Stage D must apply transitions and persist events atomically under concurrency control; these domain functions do not provide storage or exactly-once external effects.
+Evidence values are inputs from trusted policy/connector/reconciliation code. They are not bearer permissions and must never be accepted directly from a client/model as proof. Stage D [storage](STORAGE.md) applies transitions and persists events atomically under concurrency control; these domain functions do not provide storage or exactly-once external effects.
 
 The state's dispatch marker is sticky for one attempt. A separate provider session reference does not replace it.
 
@@ -77,13 +77,13 @@ A data edge binds one output port to one input port of exactly the same type. Ea
 
 Entry nodes must exist and have no incoming node dependencies. Every node must be reachable from a declared entry. Graphs may have several explicit parallel entries. Cycles, self-edges, duplicate nodes/edges, mixed missing ports and unbound required inputs are rejected.
 
-The registry capability check is separate from structural validation. It requires a descriptor for the same workspace and exact connection, always requires invoke for agent nodes, and checks declared requirements plus artifact capability for artifact inputs/outputs and structured-output capability for JSON outputs. Imported/client-supplied descriptors cannot certify themselves. No connections exist yet, so the HTTP endpoint always reports capabilities_checked false.
+The registry capability check is separate from structural validation. It requires a descriptor for the same workspace and exact connection, always requires invoke for agent nodes, and checks declared requirements plus artifact capability for artifact inputs/outputs and structured-output capability for JSON outputs. Imported/client-supplied descriptors cannot certify themselves. No operational provider connections exist yet, so the HTTP endpoint always reports capabilities_checked false.
 
 ## Revision conflicts and immutability
 
 The [Draft reference aggregate](../internal/workflows/draft.go) snapshots nested collections, serializes revision checks, generates a fresh version ID on accepted edits, and never mutates previously returned definitions. Two concurrent edits based on revision 1 yield exactly one accepted revision 2 and one ErrRevisionConflict. Invalid edits do not advance the revision.
 
-This is an in-memory reference implementation of the contract, deliberately not API storage. Stage D must perform the equivalent compare-and-swap in PostgreSQL and persist immutable version records in the same transaction. The later edit API will carry an expected_revision decimal string and return 409 revision_conflict for a stale edit. It must not reread and overwrite silently.
+This is an in-memory reference implementation of the contract, deliberately not API storage. Stage D performs the equivalent compare-and-swap in PostgreSQL and persists immutable version records in the same transaction; see [Storage](STORAGE.md). The later edit API will carry an expected_revision decimal string and return 409 revision_conflict for a stale edit. It must not reread and overwrite silently.
 
 ## Events and browser replay
 
@@ -105,7 +105,7 @@ Dispatch carries separate task/attempt/dispatch IDs, connection ID, lease epoch,
 
 An accepted acknowledgment means the runner has durably recorded the dispatch identity; it does not mean provider acceptance or task completion. A rejected acknowledgment is an admission failure and requires an error. An uncertain provider outcome belongs to an accepted attempt's event/reconciliation history. Acknowledgments must match runner, workspace, dispatch, attempt and lease epoch; a stale epoch is rejected.
 
-Actual authentication, durable intake, replay, lease fencing and action authorization are enforced in D/F/G. Structural envelope validation cannot supply those guarantees.
+Stage D implements database intake, replay and lease fencing. Authentication, runner-side fencing and action authorization remain E/F/G work. Structural envelope validation cannot supply those guarantees.
 
 ## Limits and compatibility policy
 

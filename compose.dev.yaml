@@ -1,4 +1,4 @@
-# Development-only database. The API does not use persistence until stage D.
+# Development-only database. Set CONFIGNOSTIC_DATABASE_URL and run db-migrate.
 services:
   postgres:
     image: postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc

@@ -14,7 +14,7 @@ The catalog covers 21 named agent targets plus generic ACP, A2A and custom adapt
 
 ## Starting point and interpretation
 
-The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A and B are Done after [PR #5](https://github.com/UXCentury/confignostic/pull/5). Stage C is implemented and In review; see [Contracts](../CONTRACTS.md). Stages D–Z remain Planned. Existing scaffolding does not satisfy a stage's exit gate.
+The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A–C are Done after [PR #5](https://github.com/UXCentury/confignostic/pull/5) and [PR #6](https://github.com/UXCentury/confignostic/pull/6). Stage D storage is implemented and In review; see [Storage](../STORAGE.md). Stages E–Z remain Planned. Existing scaffolding does not satisfy a stage's exit gate.
 
 “S+” is our internal quality target: demonstrated correctness, reliability, security, usability and operability against [measurable gates](QUALITY_GATES.md). It is not a claim that the current repository is production ready or an external certification.
 
@@ -36,8 +36,8 @@ Letters provide navigation; **dependencies determine execution order**. Q, R, S 
 | --- | --- | --- | --- |
 | A | [Lock the product contract](#stage-a) | None | Done |
 | B | [Make development and CI reproducible](#stage-b) | A | Done |
-| C | [Define versioned domain and wire contracts](#stage-c) | A, B | In review |
-| D | [Build durable storage and dispatch foundations](#stage-d) | C | Planned |
+| C | [Define versioned domain and wire contracts](#stage-c) | A, B | Done |
+| D | [Build durable storage and dispatch foundations](#stage-d) | C | In review |
 | E | [Establish identity and workspace boundaries](#stage-e) | C, D | Planned |
 | F | [Protect credentials and authorize actions](#stage-f) | E | Planned |
 | G | [Create isolated local and private runners](#stage-g) | C, D, E, F | Planned |
@@ -126,14 +126,14 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 **Outcome:** Give chat, runners and the canvas one common representation of work.  
 **Deliverables:** Domain types, API/schema specifications, event envelope and workflow schema v1.
 
-- [ ] **C01** — Specify workspace, project, agent registration, connection, conversation, message, task, attempt, event, approval, artifact and workflow-version identities. Provider session IDs remain separate from internal IDs.
-- [ ] **C02** — Define task transitions, actor identities, correlation IDs, sequence numbers and structured errors. Distinguish unavailable, unsupported, unauthorized, retryable and uncertain outcomes.
-- [ ] **C03** — Specify versioned HTTP APIs and browser event streams; define the runner envelope, acknowledgments and compatibility handshake. Bound request, event and artifact sizes.
-- [ ] **C04** — Define immutable workflow versions with typed node inputs/outputs, dependency edges, capability requirements and an explicit schema version. Reject unsupported versions rather than silently changing meaning.
+- [x] **C01** — Specify workspace, project, agent registration, connection, conversation, message, task, attempt, event, approval, artifact and workflow-version identities. Provider session IDs remain separate from internal IDs.
+- [x] **C02** — Define task transitions, actor identities, correlation IDs, sequence numbers and structured errors. Distinguish unavailable, unsupported, unauthorized, retryable and uncertain outcomes.
+- [x] **C03** — Specify versioned HTTP APIs and browser event streams; define the runner envelope, acknowledgments and compatibility handshake. Bound request, event and artifact sizes.
+- [x] **C04** — Define immutable workflow versions with typed node inputs/outputs, dependency edges, capability requirements and an explicit schema version. Reject unsupported versions rather than silently changing meaning.
 
 **Exit gate:** Contract examples round-trip and invalid states/schemas are rejected. Two concurrent clients cannot overwrite a workflow revision silently.
 
-**Evidence:** [Implemented contract specification](../CONTRACTS.md), embedded JSON Schemas, real HTTP validation tests, guarded lifecycle tests, concurrent revision-conflict tests and round-trip protocol fixtures. Stage C remains In review until its PR is accepted.
+**Evidence:** [Implemented contract specification](../CONTRACTS.md), embedded JSON Schemas, real HTTP validation tests, guarded lifecycle tests, concurrent revision-conflict tests and round-trip protocol fixtures. Accepted in [PR #6](https://github.com/UXCentury/confignostic/pull/6), with all three CI jobs passing.
 
 <a id="stage-d"></a>
 
@@ -150,7 +150,7 @@ During the run, restart the API and interrupt the runner connection. Reconnect w
 
 **Exit gate:** An accepted task survives restart. Duplicate requests create one logical task; killing a process at the transaction boundary loses no acknowledged state.
 
-**Evidence:** Migration logs and storage/idempotency failure tests.
+**Evidence:** [Storage implementation and test guide](../STORAGE.md), migration checksums, real PostgreSQL idempotency/fencing/crash-boundary and backup/restore integration tests. Stage D remains In review until its PR and CI evidence are accepted.
 
 <a id="stage-e"></a>
 
