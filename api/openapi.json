@@ -3,7 +3,7 @@
   "info": {
     "title": "Confignostic developer API",
     "version": "0.1.0",
-    "description": "Current surface: liveness, empty scaffold listings and stateless workflow validation. Authentication, execution and persistence are not implemented. Keep the development service bound to loopback."
+    "description": "Current surface: liveness, optional database readiness, empty scaffold listings and stateless workflow validation. PostgreSQL storage is internal; authentication and execution are not implemented. Keep the development service bound to loopback."
   },
   "servers": [
     {
@@ -202,6 +202,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "../internal/contracts/v1/schema/error.schema.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "readiness",
+        "summary": "Check configured database connectivity and migration compatibility",
+        "responses": {
+          "200": {
+            "description": "Database is connected and compatible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "ready"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database is unconfigured, unreachable or incompatible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "storage_not_configured",
+                        "not_ready"
+                      ]
+                    }
+                  }
                 }
               }
             }

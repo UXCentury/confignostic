@@ -45,15 +45,15 @@ make build
 
 `make check` runs Go formatting checks, module verification, vet, race-enabled tests, an API build, a clean frontend install, Svelte/TypeScript checks, a production frontend build, and the reference-fixture self-checks. Individual targets: `make check-go`, `make check-web`, `make check-reference`. Fix Go formatting with `gofmt -w cmd internal`.
 
-Build outputs are bin/confignostic-api and web/dist/. Run `npm --prefix web ci` before `make build` on a fresh checkout. No global Vite/Svelte installation is needed. The API does not serve the built frontend yet; unified packaging belongs to stage V.
+Build outputs are bin/confignostic-api and web/dist/. Run `npm --prefix web ci` before `make build` on a fresh checkout. No global Vite/Svelte installation is needed. The database migration binary is bin/confignostic-db. See [Storage](docs/STORAGE.md) for migration/readiness setup and `make check-storage` against a disposable PostgreSQL server. The API does not serve the built frontend yet; unified packaging belongs to stage V.
 
 The reference checks deliberately test a failing candidate and a passing bounded change. They do not invoke Codex, Cursor or any external provider. See [the fixture walkthrough](testdata/handoff/README.md).
 
-CI runs the same Go/frontend/fixture commands and a separate development-database smoke check. It uses read-only repository permissions, does not retain checkout credentials, and uses no provider credentials. Do not add production secrets or execute untrusted PR code with privileged pull_request_target workflows.
+CI runs the same Go/frontend/fixture commands and a separate real-PostgreSQL durability suite, including migration, fencing, process interruption and backup/restore checks. It uses read-only repository permissions, does not retain checkout credentials, and uses no provider credentials. Do not add production secrets or execute untrusted PR code with privileged pull_request_target workflows.
 
 ## Optional development database
 
-The current API does not read PostgreSQL; migrations and persistence start in stage D.
+The database backs the internal stage D repositories. Export CONFIGNOSTIC_DATABASE_URL and run `make db-migrate` to enable API storage readiness; [Storage](docs/STORAGE.md) documents the full setup and durability tests.
 
 ```sh
 cp .env.example .env
@@ -81,14 +81,15 @@ Only the process environment configures the Go API. It does not automatically re
 | --- | --- | --- |
 | CONFIGNOSTIC_LISTEN_ADDR | 127.0.0.1:8080 | host:port; numeric port 0–65535. Port 0 selects a free local port, reported in startup logs. |
 | CONFIGNOSTIC_SHUTDOWN_TIMEOUT | 10s | Positive Go duration such as 250ms or 15s. |
+| CONFIGNOSTIC_DATABASE_URL | Unset; stateless scaffold | PostgreSQL URL with a database name; when set, connectivity and compatible migrations are required at startup. |
 
 Explicit empty or invalid values fail before binding. Configuration errors name the setting without echoing its raw value. Read headers have a five-second deadline, idle keep-alive connections a sixty-second deadline, and headers a 32 KiB limit.
 
 SIGINT/SIGTERM stops admission and waits for active HTTP requests. If the drain deadline expires, the server closes remaining connections and exits unsuccessfully. It does not report a clean shutdown after truncating requests. These semantics currently apply to HTTP requests; future durable workers and long-lived streams need their own coordinated shutdown behavior.
 
-Logs are JSON on stderr with time, level and msg plus bounded operational fields. Never log credentials, authorization headers, request bodies or provider prompts. Add workspace/task/attempt correlation identifiers when their domain types exist. Keep internal error details in logs and use the versioned structured public error contract planned in C; do not expose raw provider or database errors to clients.
+Logs are JSON on stderr with time, level and msg plus bounded operational fields. Never log credentials, authorization headers, request bodies or provider prompts. Add workspace/task/attempt correlation identifiers when their domain types exist. Use the stage C versioned public error contract. Database startup/migration logs are deliberately generic; never log a raw driver error that could contain a credential or SQL value.
 
-GET /healthz reports process liveness only. There is no database dependency or readiness endpoint yet. Add a separate readiness check when stage D introduces required persistence, and make it fail when those dependencies cannot accept durable writes.
+GET /healthz reports process liveness only. GET /readyz checks configured database connectivity, write mode and migration compatibility. It returns 503 when storage is absent, unavailable, read-only or incompatible; it does not claim that authentication or agent execution is operational.
 
 ## Review and evidence
 

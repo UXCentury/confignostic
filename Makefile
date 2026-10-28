@@ -1,4 +1,4 @@
-.PHONY: check check-go check-web check-reference fmt-check build dev-api dev-web db-up db-down
+.PHONY: check check-go check-web check-reference check-storage fmt-check build dev-api dev-web db-up db-down db-migrate
 
 check: check-go check-web check-reference
 
@@ -10,6 +10,12 @@ check-go: fmt-check
 	go vet ./...
 	go test -race ./...
 	go build -o bin/confignostic-api ./cmd/confignostic-api
+	go build -o bin/confignostic-db ./cmd/confignostic-db
+
+check-storage:
+	@test -n "$$CONFIGNOSTIC_TEST_DATABASE_URL" || (echo 'Set CONFIGNOSTIC_TEST_DATABASE_URL to a disposable PostgreSQL server'; exit 1)
+	@test -n "$$CONFIGNOSTIC_TEST_PG_TOOLS" || (echo 'Set CONFIGNOSTIC_TEST_PG_TOOLS to the PostgreSQL tool wrapper'; exit 1)
+	go test -race -tags=integration -count=1 -timeout=5m -v ./internal/storage
 
 check-web:
 	npm --prefix web ci
@@ -21,6 +27,7 @@ check-reference:
 
 build:
 	go build -o bin/confignostic-api ./cmd/confignostic-api
+	go build -o bin/confignostic-db ./cmd/confignostic-db
 	npm --prefix web run build
 
 dev-api:
@@ -34,3 +41,6 @@ db-up:
 
 db-down:
 	docker compose -f compose.dev.yaml down
+
+db-migrate:
+	go run ./cmd/confignostic-db migrate
