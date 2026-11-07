@@ -14,7 +14,7 @@ The catalog covers 21 named agent targets plus generic ACP, A2A and custom adapt
 
 ## Starting point and interpretation
 
-The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A–C are Done after [PR #5](https://github.com/UXCentury/confignostic/pull/5) and [PR #6](https://github.com/UXCentury/confignostic/pull/6). Stage D storage is implemented and In review; see [Storage](../STORAGE.md). Stages E–Z remain Planned. Existing scaffolding does not satisfy a stage's exit gate.
+The baseline contains a Go HTTP scaffold, Svelte UI shell, documentation and backend CI. It has no operational agent integration, chat execution, persistence or workflow engine. Stages A–C are Done after [PR #5](https://github.com/UXCentury/confignostic/pull/5) and [PR #6](https://github.com/UXCentury/confignostic/pull/6). Stage D storage is implemented and In review; see [Storage](../STORAGE.md). Stage E is In progress with [E01 credential primitives](../IDENTITY.md); owner setup and durable sessions remain pending. Stages F–Z remain Planned. Existing scaffolding does not satisfy a stage's exit gate.
 
 “S+” is our internal quality target: demonstrated correctness, reliability, security, usability and operability against [measurable gates](QUALITY_GATES.md). It is not a claim that the current repository is production ready or an external certification.
 
@@ -38,7 +38,7 @@ Letters provide navigation; **dependencies determine execution order**. Q, R, S 
 | B | [Make development and CI reproducible](#stage-b) | A | Done |
 | C | [Define versioned domain and wire contracts](#stage-c) | A, B | Done |
 | D | [Build durable storage and dispatch foundations](#stage-d) | C | In review |
-| E | [Establish identity and workspace boundaries](#stage-e) | C, D | Planned |
+| E | [Establish identity and workspace boundaries](#stage-e) | C, D | In progress |
 | F | [Protect credentials and authorize actions](#stage-f) | E | Planned |
 | G | [Create isolated local and private runners](#stage-g) | C, D, E, F | Planned |
 | H | [Build the agent registry and adapter contract](#stage-h) | C, F, G | Planned |
