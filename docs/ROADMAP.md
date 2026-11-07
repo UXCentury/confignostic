@@ -2,7 +2,7 @@
 
 This is the checkpoint summary for the [A–Z development plan](plans/DEVELOPMENT_PLAN.md): **26 stages and 104 implementation tasks**.
 
-Stages A–C are Done; see [Foundation status](FOUNDATION_STATUS.md). Stage D PostgreSQL storage and dispatch foundations are implemented and In review; see [Storage](STORAGE.md). Stages E–Z remain Planned. The repository still has no working agent connector, chat execution or orchestration engine.
+Stages A–C are Done; see [Foundation status](FOUNDATION_STATUS.md). Stage D PostgreSQL storage and dispatch foundations are implemented and In review; see [Storage](STORAGE.md). Stage E is In progress with [E01 credential primitives](IDENTITY.md); owner setup and durable sessions remain pending. Stages F–Z remain Planned. The repository still has no working agent connector, chat execution or orchestration engine.
 
 ## Product destination
 
