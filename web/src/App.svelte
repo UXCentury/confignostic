@@ -1,8 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  let apiStatus = 'Checking local API…';
-  let agentCount = 0;
+  import Sidebar from './lib/Sidebar.svelte';
+  import WorkspaceOverview from './lib/WorkspaceOverview.svelte';
+  import ChatComposer from './lib/ChatComposer.svelte';
+  import type { Section } from './lib/workspace';
+
+  let section = $state<Section>('Unified chat');
+  let apiStatus = $state('Checking local API…');
+  let agentCount = $state<number | null>(null);
 
   onMount(() => {
     Promise.all([
@@ -22,31 +28,12 @@
 </svelte:head>
 
 <div class="shell">
-  <aside class="sidebar">
-    <div class="brand"><span class="mark">◎</span><span>Confignostic</span></div>
-    <div class="navtitle">WORKSPACE</div>
-    <div class="nav active">⌘ &nbsp; Unified chat</div>
-    <div class="nav">◇ &nbsp; Workflows <span class="soon">planned</span></div>
-    <div class="nav">◈ &nbsp; Agents <span class="soon">planned</span></div>
-    <div class="sidebar-footer">Open-source developer scaffold<br /><small>{apiStatus}</small></div>
-  </aside>
-
-  <main class="main">
-    <header><strong>Unified chat</strong><span class="tag">Scaffold · not operational</span></header>
-    <section class="welcome">
-      <div class="orb">◎</div>
-      <h1>One workspace for all your AI agents.</h1>
-      <p>Connect existing agents, coordinate work, and see execution across providers. This is an initial interface shell, not a functional orchestration system.</p>
-      <div class="cards">
-        <div class="card"><span class="card-title">Connections</span><b>{agentCount} agents</b><small>No adapters are installed</small></div>
-        <div class="card"><span class="card-title">Orchestration</span><b>Visual canvas</b><small>Planned feature</small></div>
-        <div class="card"><span class="card-title">Execution</span><b>Durable tasks</b><small>Planned feature</small></div>
-      </div>
-    </section>
-    <div class="composer">
-      <input disabled aria-label="Chat unavailable" placeholder="Connect an agent to enable chat (coming soon)" />
-      <button disabled aria-label="Sending unavailable">↗</button>
+  <Sidebar {section} select={(item) => section = item} status={apiStatus} />
+  <main>
+    <header>Workspace <span aria-hidden="true">/</span> <strong>{section}</strong></header>
+    <div class="content">
+      <WorkspaceOverview {section} count={agentCount} />
+      {#if section === 'Unified chat'}<ChatComposer />{/if}
     </div>
-    <p class="note">No agent messages have been sent. Chat and agent connections are not operational yet.</p>
   </main>
 </div>
