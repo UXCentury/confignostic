@@ -249,11 +249,53 @@ type Delivery struct {
 	Provider   *v1.ProviderReference
 }
 
+func (in Delivery) valid() bool {
+	return bounded(in.Source, 256) && bounded(in.ExternalID, 512) && in.Audit.valid() && in.Change.To != domain.Dispatched
+}
+
+func deliveryDigest(dispatch domain.DispatchID, in Delivery) string {
+	return digest(struct {
+		Dispatch                                         domain.DispatchID
+		Source, ExternalID, To, Evidence, ChangeDispatch string
+		Audit                                            Audit
+		Provider                                         *v1.ProviderReference
+	}{dispatch, in.Source, in.ExternalID, string(in.Change.To), string(in.Change.Evidence), in.Change.DispatchID.String(), in.Audit, in.Provider})
+}
+
+func readDeliveryReceipt(ctx context.Context, q interface {
+	QueryRow(context.Context, string, ...any) pgx.Row
+}, ws domain.WorkspaceID, dispatch domain.DispatchID, in Delivery) (domain.Counter, error) {
+	var prior, sequence string
+	err := q.QueryRow(ctx, `SELECT i.digest,i.sequence::text FROM confignostic.dispatches d JOIN confignostic.attempts a ON (a.workspace_id,a.id)=(d.workspace_id,d.attempt_id) JOIN confignostic.tasks t ON (t.workspace_id,t.id)=(a.workspace_id,a.task_id) JOIN confignostic.inbox i ON i.workspace_id=t.workspace_id AND i.connection_id=t.connection_id AND i.source=$3 AND i.external_id=$4 WHERE d.workspace_id=$1 AND d.id=$2`, ws.String(), dispatch.String(), in.Source, in.ExternalID).Scan(&prior, &sequence)
+	if err != nil {
+		return 0, dbError(err)
+	}
+	if prior != deliveryDigest(dispatch, in) {
+		return 0, ErrConflict
+	}
+	seq, err := parseCounter(sequence)
+	if err != nil {
+		return 0, ErrInvalid
+	}
+	return seq, nil
+}
+
+// DeliveryReceipt reconciles a lost Ingest acknowledgement without requiring a
+// live lease. It only reads an existing receipt; it never changes state, renews a
+// lease, or authorizes a resend. ErrNotFound is not proof of provider nonexecution.
+// Like other repository reads, callers must authorize access to the workspace.
+func (s *Store) DeliveryReceipt(ctx context.Context, ws domain.WorkspaceID, dispatch domain.DispatchID, in Delivery) (domain.Counter, error) {
+	if ws.Validate() != nil || dispatch.Validate() != nil || !in.valid() {
+		return 0, ErrInvalid
+	}
+	return readDeliveryReceipt(ctx, s.pool, ws, dispatch, in)
+}
+
 // Ingest acknowledges only committed receipts. Source/event identity reuse with
 // different content fails even if the original event has since been compacted.
 func (s *Store) Ingest(ctx context.Context, l Lease, in Delivery) (domain.Counter, error) {
 	var sequence domain.Counter
-	if !bounded(in.Source, 256) || !bounded(in.ExternalID, 512) || !in.Audit.valid() || in.Change.To == domain.Dispatched {
+	if !in.valid() {
 		return 0, ErrInvalid
 	}
 	err := s.fenced(ctx, l, func(tx pgx.Tx) error {
@@ -261,23 +303,13 @@ func (s *Store) Ingest(ctx context.Context, l Lease, in Delivery) (domain.Counte
 		if err := tx.QueryRow(ctx, `SELECT t.connection_id FROM confignostic.tasks t JOIN confignostic.attempts a ON (a.workspace_id,a.task_id)=(t.workspace_id,t.id) WHERE a.workspace_id=$1 AND a.id=$2`, l.Workspace.String(), l.Attempt.String()).Scan(&connection); err != nil {
 			return dbError(err)
 		}
-		hash := digest(struct {
-			Dispatch                                         domain.DispatchID
-			Source, ExternalID, To, Evidence, ChangeDispatch string
-			Audit                                            Audit
-			Provider                                         *v1.ProviderReference
-		}{l.Dispatch, in.Source, in.ExternalID, string(in.Change.To), string(in.Change.Evidence), in.Change.DispatchID.String(), in.Audit, in.Provider})
-		var prior, seq string
-		err := tx.QueryRow(ctx, `SELECT digest,sequence::text FROM confignostic.inbox WHERE workspace_id=$1 AND connection_id=$2 AND source=$3 AND external_id=$4`, l.Workspace.String(), connection, in.Source, in.ExternalID).Scan(&prior, &seq)
+		var err error
+		sequence, err = readDeliveryReceipt(ctx, tx, l.Workspace, l.Dispatch, in)
 		if err == nil {
-			if prior != hash {
-				return ErrConflict
-			}
-			sequence, err = parseCounter(seq)
-			return err
+			return nil
 		}
-		if !errors.Is(err, pgx.ErrNoRows) {
-			return dbError(err)
+		if !errors.Is(err, ErrNotFound) {
+			return err
 		}
 		a, err := readAttempt(ctx, tx, l.Workspace, l.Attempt)
 		if err != nil {
@@ -287,7 +319,7 @@ func (s *Store) Ingest(ctx context.Context, l Lease, in Delivery) (domain.Counte
 		if err != nil {
 			return err
 		}
-		_, err = tx.Exec(ctx, `INSERT INTO confignostic.inbox VALUES($1,$2,$3,$4,$5,$6,$7)`, l.Workspace.String(), connection, in.Source, in.ExternalID, hash, l.Dispatch.String(), counterArg(sequence))
+		_, err = tx.Exec(ctx, `INSERT INTO confignostic.inbox VALUES($1,$2,$3,$4,$5,$6,$7)`, l.Workspace.String(), connection, in.Source, in.ExternalID, deliveryDigest(l.Dispatch, in), l.Dispatch.String(), counterArg(sequence))
 		return dbError(err)
 	})
 	return sequence, err
