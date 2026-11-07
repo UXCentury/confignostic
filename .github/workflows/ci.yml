@@ -44,18 +44,30 @@ jobs:
 
   development-database:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     env:
       CONFIGNOSTIC_DEV_DB_PASSWORD: disposable-ci-database-only
       CONFIGNOSTIC_DEV_DB_PORT: "55432"
+      CONFIGNOSTIC_DATABASE_URL: postgres://confignostic:disposable-ci-database-only@127.0.0.1:55432/confignostic_dev?sslmode=disable
+      CONFIGNOSTIC_TEST_DATABASE_URL: postgres://confignostic:disposable-ci-database-only@127.0.0.1:55432/confignostic_dev?sslmode=disable
+      CONFIGNOSTIC_TEST_PG_TOOLS: ${{ github.workspace }}/scripts/postgres-tools
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
       - run: docker compose -f compose.dev.yaml config --quiet
       - run: make db-up
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
       - name: Verify the development database
         run: docker compose -f compose.dev.yaml exec -T postgres psql -U confignostic -d confignostic_dev -v ON_ERROR_STOP=1 -c 'SELECT 1;'
+      - name: Apply forward-only migrations
+        run: make db-migrate
+      - name: Verify durability, fences, crash boundaries and backup/restore
+        run: make check-storage
       - name: Remove the disposable CI database
         if: always()
         run: docker compose -f compose.dev.yaml down --volumes

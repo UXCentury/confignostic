@@ -4,6 +4,7 @@ package config
 import (
 	"errors"
 	"net"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 type Config struct {
 	ListenAddr      string
 	ShutdownTimeout time.Duration
+	DatabaseURL     string
 }
 
 // Load accepts a lookup function so tests never mutate process-wide environment.
@@ -39,6 +41,13 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 			return Config{}, errors.New("CONFIGNOSTIC_SHUTDOWN_TIMEOUT must be a positive duration, for example 10s")
 		}
 		cfg.ShutdownTimeout = duration
+	}
+	if value, set := lookup("CONFIGNOSTIC_DATABASE_URL"); set {
+		parsed, err := url.Parse(value)
+		if err != nil || (parsed.Scheme != "postgres" && parsed.Scheme != "postgresql") || parsed.Path == "" || parsed.Path == "/" || parsed.Fragment != "" || strings.ContainsAny(value, "\r\n\x00") {
+			return Config{}, errors.New("CONFIGNOSTIC_DATABASE_URL must be a PostgreSQL URL with a database name")
+		}
+		cfg.DatabaseURL = value
 	}
 	return cfg, nil
 }

@@ -28,6 +28,6 @@ All three [GitHub CI jobs](https://github.com/UXCentury/confignostic/actions/run
 
 All 21 agent targets remain Planned. The fixture self-check is local test code, not a real provider run. No provider access, user interviews, paid demand, authentication, persistence or canvas behavior is implied by this change. User feedback collection remains ongoing work.
 
-Stages A/B are accepted and their task checkboxes are complete. The next change implements [stage C contracts](CONTRACTS.md), including stateless graph validation. PostgreSQL migrations follow in D; the current API does not use the Compose database.
+Stages A/B are accepted and their task checkboxes are complete. Stage C [contracts](CONTRACTS.md) are accepted in PR #6, including stateless graph validation. Stage D adds [PostgreSQL storage](STORAGE.md) and optional API database readiness.
 
 See [Contributing](../CONTRIBUTING.md), [Product acceptance](PRODUCT.md), [Reference fixture](../testdata/handoff/README.md), and [A–Z plan](plans/DEVELOPMENT_PLAN.md).

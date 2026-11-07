@@ -1,0 +1,6 @@
+#!/bin/sh
+# Integration-test wrapper: use the same PostgreSQL tools as the Compose server.
+set -eu
+cd "$(dirname "$0")/.."
+case "${1:-}" in pg_dump|pg_restore) ;; *) exit 2 ;; esac
+exec docker compose -f compose.dev.yaml exec -T postgres "$@"

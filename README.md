@@ -33,7 +33,7 @@ The [A–Z development plan](docs/plans/DEVELOPMENT_PLAN.md) contains **26 stage
 - [Quality gates](docs/plans/QUALITY_GATES.md) — measurable acceptance criteria for reliability, security, usability and operations.
 - [Roadmap](docs/ROADMAP.md) — release checkpoints and the separate self-hosted/cloud tracks.
 
-The A–B foundation is merged. Stage C adds [versioned contracts and stateless workflow validation](docs/CONTRACTS.md). See [Foundation status](docs/FOUNDATION_STATUS.md) for accepted foundation evidence. Agent integrations, chat execution, persistence and the canvas remain planned.
+The A–C foundation is merged. Stage C supplies [versioned contracts and stateless workflow validation](docs/CONTRACTS.md). See [Foundation status](docs/FOUNDATION_STATUS.md) for accepted foundation evidence. Stage D adds [PostgreSQL storage and dispatch foundations](docs/STORAGE.md). Agent integrations, chat execution and the canvas remain planned.
 
 ## Run the development scaffold
 
@@ -46,7 +46,7 @@ npm --prefix web ci
 make dev-web
 ```
 
-The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/agents`, and `/api/v1/workflows`. The latter two return empty lists: no agent integration exists yet. POST `/api/v1/workflows/validate` validates a graph without storing or executing it. The [contract guide](docs/CONTRACTS.md) includes a runnable request and the [OpenAPI document](api/openapi.json) describes the current surface.
+The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/agents`, and `/api/v1/workflows`. The latter two return empty lists: no agent integration exists yet. POST `/api/v1/workflows/validate` validates a graph without storing or executing it. The [contract guide](docs/CONTRACTS.md) includes a runnable request and the [OpenAPI document](api/openapi.json) describes the current surface. `/readyz` reports database readiness; see [database setup](docs/STORAGE.md).
 
 ## Project layout
 
@@ -54,6 +54,7 @@ The Go API binds to 127.0.0.1:8080 by default and provides `/healthz`, `/api/v1/
 - `internal/httpapi/` — HTTP routes and tests
 - `internal/domain/` — resource identities and guarded task lifecycle
 - `internal/contracts/v1/` — embedded schemas, event/runner contracts and fixtures
+- `internal/storage/` — PostgreSQL migrations, durable acceptance, inbox/outbox and fenced leases
 - `internal/workflows/` — graph validation and a revision-checked reference draft
 - `web/` — Svelte/Vite interface scaffold
 - `docs/` — architecture, product scope, connectors and roadmap

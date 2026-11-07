@@ -2,7 +2,7 @@
 
 ## Status and product boundary
 
-This is the **target architecture**, not a description of implemented behavior. The repository has a Go HTTP scaffold, validated startup configuration, synchronous request draining, reproducible build/CI tooling and a Svelte interface shell. The optional Compose database is development infrastructure; the API does not yet use it. Stage C implements typed identities, guarded transitions, wire contracts and stateless graph validation; see [Contracts](CONTRACTS.md). Persistence, authentication, runners, connectors and orchestration remain planned.
+This is the **target architecture**, not a description of implemented behavior. The repository has a Go HTTP scaffold, validated startup configuration, synchronous request draining, reproducible build/CI tooling and a Svelte interface shell. The optional Compose database supports the stage D repositories; a configured API verifies connectivity/schema at startup and exposes database readiness. Stage C implements typed identities, guarded transitions, wire contracts and stateless graph validation; see [Contracts](CONTRACTS.md). Stage D implements [PostgreSQL durability and dispatch fencing](STORAGE.md). Public write endpoints, authentication, runners, connectors and orchestration remain planned.
 
 Confignostic owns the shared chat, workflow definitions, approvals, execution history and artifact references. It coordinates independent agent runtimes through documented interfaces. Core chat, canvas, connectors, automation and collaboration remain self-hostable; managed cloud operates the same core.
 
